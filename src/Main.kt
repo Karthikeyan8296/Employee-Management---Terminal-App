@@ -27,7 +27,7 @@ fun main(){
 
     when(i){
         1 -> addEmployee()
-        2 -> println("List all is selected")
+        2 -> listAllEmployee()
         3 -> println("find by role is selected")
         4 -> println("Filter salary is selected")
         5 -> println("delete is selected")
@@ -36,9 +36,13 @@ fun main(){
     }
 }
 
-fun memory(data: List<Employee>){
-    data.forEach {
-        println("your data: $it")
+object Memory{
+    var data = mutableListOf<Employee>()
+
+    fun showData(){
+        data.forEach {
+            println("your data: $it")
+        }
     }
 }
 
@@ -76,46 +80,18 @@ fun addEmployee(){
     println("Employee Salary")
     val salary = readln().toInt()
 
-    val employee = listOf<Employee>(Employee(name = name, id = id, salary = salary, role = roleSelected))
+    val employee = Employee(name = name, id = id, salary = salary, role = roleSelected)
 
-    memory(data = employee)
+    Memory.data.add(employee)
 
-    println("Cool! wanna add some?")
-    continues()
+    println("Employee created successfully")
+
+    Memory.showData()
+
+    main()
 }
 
-
-
-fun continues(){
-    //Add
-    println("1. Add Employee")
-
-    //List
-    println("2. List All the Employee")
-
-    //Find
-    println("3. Find Employee by Role")
-
-    //Filter
-    println("4. Filter Employee by Salary")
-
-    //Delete
-    println("5. Delete Employee by Id")
-
-    //Exit
-    println("6. Exit")
-
-    println("Select your work to do! by numbers from 1 - 6")
-
-    val i = readln().toInt()
-
-    when(i){
-        1 -> addEmployee()
-        2 -> println("List all is selected")
-        3 -> println("find by role is selected")
-        4 -> println("Filter salary is selected")
-        5 -> println("delete is selected")
-        6 -> return
-        else -> println("Sorry Please select one of these to continue")
-    }
+fun listAllEmployee(){
+    Memory.showData()
+    main()
 }
