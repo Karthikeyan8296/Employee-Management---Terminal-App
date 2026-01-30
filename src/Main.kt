@@ -1,5 +1,3 @@
-import javax.xml.crypto.Data
-
 fun main(){
     //Add
     println("1. Add Employee")
@@ -27,7 +25,7 @@ fun main(){
         1 -> addEmployee()
         2 -> listAllEmployee()
         3 -> findEmployeeRole()
-        4 -> println("Filter salary is selected")
+        4 -> filterBySalary()
         5 -> deleteEmployeeById()
         6 -> return
         else -> println("Sorry Please select one of these to continue")
@@ -116,5 +114,38 @@ fun deleteEmployeeById(){
     }else{
         println("No Employee ID exist!!")
     }
+    main()
+}
+
+fun filterBySalary(){
+    println("Select which type of filter you want:")
+    println("1. Exact salary Amount \n2. Salary between min X and max Y")
+    val enterAmount = readln().toInt()
+
+    when(enterAmount){
+        1 -> filterByExactAmount()
+        2 -> filterAmountMaxMin()
+        else -> {
+            println("Invalid salary")
+            main()
+        }
+    }
+}
+
+fun filterByExactAmount(){
+    println("Enter the exact salary")
+    val exact = readln().toInt()
+    Memory.data.filter { it.salary == exact }.forEach { println(it) }
+    main()
+}
+
+fun filterAmountMaxMin(){
+    println("Enter the Minimum Salary")
+    val min = readln().toInt()
+    println("Enter the Maximum Salary")
+    val max = readln().toInt()
+
+    Memory.data.filter { it.salary in min..<max }.forEach { println(it) }
+    println("Salary fetched successfully!")
     main()
 }
