@@ -1,3 +1,7 @@
+import Memory.data
+import com.google.gson.Gson
+import java.io.File
+
 fun main() {
     println("======================================")
     //Add
@@ -48,6 +52,14 @@ object Memory {
             }
         }
     }
+}
+
+fun saveTheEmployeeData(){
+    val gson = Gson()
+    val converter = gson.toJson(data)
+
+    val file = File("data.json")
+    file.writeText(converter)
 }
 
 data class Employee(
@@ -107,15 +119,17 @@ fun addEmployee() {
 
 
     val employee = Employee(name = name, id = id, salary = salary, role = roleSelected as Role)
-    Memory.data[id as Int] = employee
+    data[id as Int] = employee
     println("Employee created successfully")
 
+    saveTheEmployeeData()
     Memory.showData()
     main()
 }
 
 fun listAllEmployee() {
     Memory.showData()
+    saveTheEmployeeData()
     main()
 }
 
@@ -125,9 +139,9 @@ fun findEmployeeRole() {
     val role = readln().toIntOrNull()
 
     when (role) {
-        1 -> Memory.data.filter { it.value.role == Role.MANAGER }.forEach { println("Manager Role: $it") }
-        2 -> Memory.data.filter { it.value.role == Role.DEVELOPER }.forEach { println("Developer Role: $it") }
-        3 -> Memory.data.filter { it.value.role == Role.INTERN }.forEach { println("Intern Role: $it") }
+        1 -> data.filter { it.value.role == Role.MANAGER }.forEach { println("Manager Role: $it") }
+        2 -> data.filter { it.value.role == Role.DEVELOPER }.forEach { println("Developer Role: $it") }
+        3 -> data.filter { it.value.role == Role.INTERN }.forEach { println("Intern Role: $it") }
         else -> println("Invalid role selected")
     }
     main()
@@ -138,6 +152,7 @@ fun deleteEmployeeById() {
     val deleteId = readln().toIntOrNull()
 
     Memory.data.remove(key = deleteId as Int).also { println("Employee deleted successFully") }
+    saveTheEmployeeData()
     main()
 }
 
