@@ -36,7 +36,7 @@ fun main() {
 }
 
 object Memory {
-    var data = mutableListOf<Employee>()
+    var data = mutableMapOf<Int, Employee>()
 
     fun showData() {
 
@@ -44,7 +44,7 @@ object Memory {
             println("No Employee data!")
         }else{
             data.forEach {
-                println("Employee data: $it")
+                println("Employee data: ${it.value}")
             }
         }
     }
@@ -107,7 +107,7 @@ fun addEmployee() {
 
 
     val employee = Employee(name = name, id = id, salary = salary, role = roleSelected as Role)
-    Memory.data.add(employee)
+    Memory.data[id as Int] = employee
     println("Employee created successfully")
 
     Memory.showData()
@@ -125,9 +125,9 @@ fun findEmployeeRole() {
     val role = readln().toIntOrNull()
 
     when (role) {
-        1 -> Memory.data.filter { it.role == Role.MANAGER }.forEach { println("Manager Role: $it") }
-        2 -> Memory.data.filter { it.role == Role.DEVELOPER }.forEach { println("Developer Role: $it") }
-        3 -> Memory.data.filter { it.role == Role.INTERN }.forEach { println("Intern Role: $it") }
+        1 -> Memory.data.filter { it.value.role == Role.MANAGER }.forEach { println("Manager Role: $it") }
+        2 -> Memory.data.filter { it.value.role == Role.DEVELOPER }.forEach { println("Developer Role: $it") }
+        3 -> Memory.data.filter { it.value.role == Role.INTERN }.forEach { println("Intern Role: $it") }
         else -> println("Invalid role selected")
     }
     main()
@@ -137,11 +137,7 @@ fun deleteEmployeeById() {
     println("Enter the Employee ID, that you need to delete")
     val deleteId = readln().toIntOrNull()
 
-    if (Memory.data.removeIf { it.id == deleteId }) {
-        println("Employee deleted successfully!!")
-    } else {
-        println("No Employee ID exist!!")
-    }
+    Memory.data.remove(key = deleteId as Int).also { println("Employee deleted successFully") }
     main()
 }
 
@@ -167,7 +163,7 @@ fun filterByExactAmount() {
         println("Invalid salary")
         main()
     }else{
-        Memory.data.filter { it.salary == exact }.forEach { println(it) }
+        Memory.data.filter { it.value.salary == exact }.forEach { println(it) }
         main()
     }
 }
@@ -182,7 +178,7 @@ fun filterAmountMaxMin() {
         println("Invalid inputs")
         main()
     }else{
-        Memory.data.filter { it.salary in min..<max }.forEach { println(it) }
+        Memory.data.filter { it.value.salary in min..<max }.forEach { println(it) }
         println("Salary fetched successfully!")
         main()
     }
