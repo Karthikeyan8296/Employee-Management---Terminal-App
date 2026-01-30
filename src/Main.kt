@@ -28,7 +28,7 @@ fun main(){
     when(i){
         1 -> addEmployee()
         2 -> listAllEmployee()
-        3 -> println("find by role is selected")
+        3 -> findEmployeeRole()
         4 -> println("Filter salary is selected")
         5 -> println("delete is selected")
         6 -> return
@@ -94,4 +94,16 @@ fun addEmployee(){
 fun listAllEmployee(){
     Memory.showData()
     main()
+}
+
+fun findEmployeeRole(){
+    println("find employee by role")
+    println("\n1. MANAGER \n2. DEVELOPER \n3. INTERN")
+    val role = readln().toInt()
+
+    when(role){
+        1 -> Memory.data.filter { it.role == Role.MANAGER }.forEach { println("Manager Role: $it") }
+        2 -> Memory.data.filter { it.role ==  Role.DEVELOPER}.forEach { println("Developer Role: $it") }
+        3 -> Memory.data.filter { it.role == Role.INTERN}.forEach { println("Intern Role: $it") }
+    }
 }
