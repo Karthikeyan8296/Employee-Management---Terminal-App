@@ -1,4 +1,5 @@
-fun main(){
+fun main() {
+    println("======================================")
     //Add
     println("1. Add Employee")
 
@@ -17,11 +18,13 @@ fun main(){
     //Exit
     println("6. Exit")
 
+    println("======================================")
+
     println("Select your work to do! by numbers from 1 - 6")
 
-    val i = readln().toInt()
+    val i = readln().toIntOrNull()
 
-    when(i){
+    when (i) {
         1 -> addEmployee()
         2 -> listAllEmployee()
         3 -> findEmployeeRole()
@@ -32,120 +35,155 @@ fun main(){
     }
 }
 
-object Memory{
+object Memory {
     var data = mutableListOf<Employee>()
 
-    fun showData(){
-        data.forEach {
-            println("your data: $it")
+    fun showData() {
+
+        if(data.isEmpty()) {
+            println("No Employee data!")
+        }else{
+            data.forEach {
+                println("Employee data: $it")
+            }
         }
     }
 }
 
 data class Employee(
-    val id: Int,
+    val id: Int?,
     val name: String,
-    val role: Role = Role.DEVELOPER,
-    val salary: Int
+    val role: Role = Role.NO_ROLE,
+    val salary: Int?
 )
 
-enum class Role{
+enum class Role {
     MANAGER,
     DEVELOPER,
     INTERN,
     NO_ROLE
 }
 
-fun addEmployee(){
-    //name
+fun addEmployee() {
+    //NAME
     println("Employee name?")
-    val name = readln()
+    val inputName = readln().trim()
+    var name = ""
+    if (inputName.isNotEmpty() && inputName.all { it.isLetter() }) {
+        name = inputName
+    } else {
+        println("Invalid input")
+        main()
+    }
 
+    //ROLE
     println("Employee role? \n1. MANAGER \n2. DEVELOPER \n3. INTERN")
-    val role = readln().toInt()
-    val roleSelected = when(role){
+    val role = readln().toIntOrNull()
+    val roleSelected = when (role) {
         1 -> Role.MANAGER
         2 -> Role.DEVELOPER
         3 -> Role.INTERN
-        else -> Role.NO_ROLE
+        else -> {
+            println("Invalid role")
+            main()
+        }
     }
 
+    //ID
     println("Employee id")
-    val id = readln().toInt()
+    val id = readln().toIntOrNull()
+    if (id == null) {
+        println("invalid id")
+        main()
+    }
 
+    //SALARY
     println("Employee Salary")
-    val salary = readln().toInt()
+    val salary = readln().toIntOrNull()
+    if (salary == null) {
+        println("invalid salary")
+        main()
+    }
 
-    val employee = Employee(name = name, id = id, salary = salary, role = roleSelected)
 
+    val employee = Employee(name = name, id = id, salary = salary, role = roleSelected as Role)
     Memory.data.add(employee)
-
     println("Employee created successfully")
 
     Memory.showData()
-
     main()
 }
 
-fun listAllEmployee(){
+fun listAllEmployee() {
     Memory.showData()
     main()
 }
 
-fun findEmployeeRole(){
+fun findEmployeeRole() {
     println("find employee by role")
-    println("\n1. MANAGER \n2. DEVELOPER \n3. INTERN")
-    val role = readln().toInt()
+    println("1. MANAGER \n2. DEVELOPER \n3. INTERN")
+    val role = readln().toIntOrNull()
 
-    when(role){
+    when (role) {
         1 -> Memory.data.filter { it.role == Role.MANAGER }.forEach { println("Manager Role: $it") }
-        2 -> Memory.data.filter { it.role ==  Role.DEVELOPER}.forEach { println("Developer Role: $it") }
-        3 -> Memory.data.filter { it.role == Role.INTERN}.forEach { println("Intern Role: $it") }
+        2 -> Memory.data.filter { it.role == Role.DEVELOPER }.forEach { println("Developer Role: $it") }
+        3 -> Memory.data.filter { it.role == Role.INTERN }.forEach { println("Intern Role: $it") }
+        else -> println("Invalid role selected")
     }
     main()
 }
 
-fun deleteEmployeeById(){
+fun deleteEmployeeById() {
     println("Enter the Employee ID, that you need to delete")
-    val deleteId = readln().toInt()
+    val deleteId = readln().toIntOrNull()
 
-    if(Memory.data.removeIf { it.id == deleteId }){
+    if (Memory.data.removeIf { it.id == deleteId }) {
         println("Employee deleted successfully!!")
-    }else{
+    } else {
         println("No Employee ID exist!!")
     }
     main()
 }
 
-fun filterBySalary(){
+fun filterBySalary() {
     println("Select which type of filter you want:")
     println("1. Exact salary Amount \n2. Salary between min X and max Y")
-    val enterAmount = readln().toInt()
+    val enterAmount = readln().toIntOrNull()
 
-    when(enterAmount){
+    when (enterAmount) {
         1 -> filterByExactAmount()
         2 -> filterAmountMaxMin()
         else -> {
-            println("Invalid salary")
+            println("Invalid option")
             main()
         }
     }
 }
 
-fun filterByExactAmount(){
+fun filterByExactAmount() {
     println("Enter the exact salary")
-    val exact = readln().toInt()
-    Memory.data.filter { it.salary == exact }.forEach { println(it) }
-    main()
+    val exact = readln().toIntOrNull()
+    if(exact == null){
+        println("Invalid salary")
+        main()
+    }else{
+        Memory.data.filter { it.salary == exact }.forEach { println(it) }
+        main()
+    }
 }
 
-fun filterAmountMaxMin(){
+fun filterAmountMaxMin() {
     println("Enter the Minimum Salary")
-    val min = readln().toInt()
+    val min = readln().toIntOrNull()
     println("Enter the Maximum Salary")
-    val max = readln().toInt()
+    val max = readln().toIntOrNull()
 
-    Memory.data.filter { it.salary in min..<max }.forEach { println(it) }
-    println("Salary fetched successfully!")
-    main()
+    if(min == null || max == null){
+        println("Invalid inputs")
+        main()
+    }else{
+        Memory.data.filter { it.salary in min..<max }.forEach { println(it) }
+        println("Salary fetched successfully!")
+        main()
+    }
 }
