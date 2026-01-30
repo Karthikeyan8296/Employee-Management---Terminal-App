@@ -1,8 +1,6 @@
 import javax.xml.crypto.Data
 
 fun main(){
-    println("Welcome to Employee Management!!!")
-
     //Add
     println("1. Add Employee")
 
@@ -30,7 +28,7 @@ fun main(){
         2 -> listAllEmployee()
         3 -> findEmployeeRole()
         4 -> println("Filter salary is selected")
-        5 -> println("delete is selected")
+        5 -> deleteEmployeeById()
         6 -> return
         else -> println("Sorry Please select one of these to continue")
     }
@@ -106,4 +104,17 @@ fun findEmployeeRole(){
         2 -> Memory.data.filter { it.role ==  Role.DEVELOPER}.forEach { println("Developer Role: $it") }
         3 -> Memory.data.filter { it.role == Role.INTERN}.forEach { println("Intern Role: $it") }
     }
+    main()
+}
+
+fun deleteEmployeeById(){
+    println("Enter the Employee ID, that you need to delete")
+    val deleteId = readln().toInt()
+
+    if(Memory.data.removeIf { it.id == deleteId }){
+        println("Employee deleted successfully!!")
+    }else{
+        println("No Employee ID exist!!")
+    }
+    main()
 }
