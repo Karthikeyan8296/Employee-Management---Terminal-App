@@ -1,14 +1,1 @@
-{
-  "1": {
-    "id": 1,
-    "name": "karthik",
-    "role": "DEVELOPER",
-    "salary": 6000
-  },
-  "2": {
-    "id": 2,
-    "name": "bharath",
-    "role": "INTERN",
-    "salary": 3000
-  }
-}
+{"1":{"id":1,"name":"karthik","role":"DEVELOPER","salary":6000},"1234":{"id":1234,"name":"Thiagau","role":"MANAGER","salary":123123},"34":{"id":34,"name":"kartgi","role":"DEVELOPER","salary":4000}}

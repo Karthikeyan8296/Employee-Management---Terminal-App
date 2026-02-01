@@ -46,9 +46,9 @@ object Memory {
     var data = mutableMapOf<Int, Employee>()
 
     fun showData() {
-        if(data.isEmpty()) {
+        if (data.isEmpty()) {
             println("No Employee data!")
-        }else{
+        } else {
             data.forEach {
                 println("Employee data: ${it.value}")
             }
@@ -56,7 +56,7 @@ object Memory {
     }
 }
 
-fun saveData(){
+fun saveData() {
     val gson = Gson()
     val converter = gson.toJson(data)
 
@@ -64,9 +64,9 @@ fun saveData(){
     file.writeText(converter)
 }
 
-fun loadData(){
+fun loadData() {
     val file = File("data.json")
-    if(!file.exists()) return
+    if (!file.exists()) return
 
     val json = file.readText()
     val gson = Gson()
@@ -93,12 +93,10 @@ fun addEmployee() {
     //NAME
     println("Employee name?")
     val inputName = readln().trim()
-    var name = ""
-    if (inputName.isNotEmpty() && inputName.all { it.isLetter() }) {
-        name = inputName
-    } else {
+    //need to cover the name in small case, and add . for initial edge cases
+    if (inputName.isEmpty() || !inputName.all { it.isLetter() }) {
         println("Invalid input")
-        main()
+        return main()
     }
 
     //ROLE
@@ -110,29 +108,27 @@ fun addEmployee() {
         3 -> Role.INTERN
         else -> {
             println("Invalid role")
-            main()
+            return main()
         }
     }
 
     //ID
-    println("Employee id")
-    val id = readln().toIntOrNull()
-    if (id == null) {
-        println("invalid id")
-        main()
+
+    println("Employee id, only in numbers")
+    val id = readln().toIntOrNull() ?: run {
+        println("Invalid input")
+        return main()
     }
 
     //SALARY
     println("Employee Salary")
-    val salary = readln().toIntOrNull()
-    if (salary == null) {
-        println("invalid salary")
-        main()
+    val salary = readln().toIntOrNull() ?: run {
+        println("Invalid input")
+        return main()
     }
 
-
-    val employee = Employee(name = name, id = id, salary = salary, role = roleSelected as Role)
-    data[id as Int] = employee
+    val employee = Employee(name = inputName, id = id, salary = salary, role = roleSelected)
+    data[id] = employee
     println("Employee created successfully")
 
     saveData()
@@ -163,9 +159,14 @@ fun deleteEmployeeById() {
     println("Enter the Employee ID, that you need to delete")
     val deleteId = readln().toIntOrNull()
 
-    Memory.data.remove(key = deleteId as Int).also { println("Employee deleted successFully") }
-    saveData()
-    main()
+    if (deleteId == null || Memory.data.remove(deleteId) == null) {
+        println("Delete Employee failed")
+        main()
+    } else {
+        data.remove(deleteId).also { println("Employee data deleted successfully") }
+        saveData()
+        main()
+    }
 }
 
 fun filterBySalary() {
@@ -186,12 +187,20 @@ fun filterBySalary() {
 fun filterByExactAmount() {
     println("Enter the exact salary")
     val exact = readln().toIntOrNull()
-    if(exact == null){
+    if (exact == null) {
         println("Invalid salary")
         main()
-    }else{
-        Memory.data.filter { it.value.salary == exact }.forEach { println(it) }
-        main()
+    } else {
+        val result = data.filter { it.value.salary == exact }
+        if (result.isEmpty()) {
+            println("No salary like this found")
+            main()
+        } else {
+            result.forEach {
+                println(it)
+                main()
+            }
+        }
     }
 }
 
@@ -201,12 +210,18 @@ fun filterAmountMaxMin() {
     println("Enter the Maximum Salary")
     val max = readln().toIntOrNull()
 
-    if(min == null || max == null){
+    if (min == null || max == null) {
         println("Invalid inputs")
         main()
-    }else{
-        Memory.data.filter { it.value.salary in min..<max }.forEach { println(it) }
-        println("Salary fetched successfully!")
-        main()
+    } else {
+        val result = data.filter { it.value.salary in min..max }
+        if (result.isEmpty()) {
+            println("No salary like this found")
+        } else {
+            result.forEach {
+                println(it)
+                main()
+            }
+        }
     }
 }
