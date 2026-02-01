@@ -1,8 +1,11 @@
 import Memory.data
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.io.File
 
 fun main() {
+    loadData()
+
     println("======================================")
     //Add
     println("1. Add Employee")
@@ -43,7 +46,6 @@ object Memory {
     var data = mutableMapOf<Int, Employee>()
 
     fun showData() {
-
         if(data.isEmpty()) {
             println("No Employee data!")
         }else{
@@ -54,12 +56,23 @@ object Memory {
     }
 }
 
-fun saveTheEmployeeData(){
+fun saveData(){
     val gson = Gson()
     val converter = gson.toJson(data)
 
     val file = File("data.json")
     file.writeText(converter)
+}
+
+fun loadData(){
+    val file = File("data.json")
+    if(!file.exists()) return
+
+    val json = file.readText()
+    val gson = Gson()
+
+    val type = object : TypeToken<MutableMap<Int, Employee>>() {}.type
+    Memory.data = gson.fromJson(json, type) ?: mutableMapOf()
 }
 
 data class Employee(
@@ -122,14 +135,13 @@ fun addEmployee() {
     data[id as Int] = employee
     println("Employee created successfully")
 
-    saveTheEmployeeData()
+    saveData()
     Memory.showData()
     main()
 }
 
 fun listAllEmployee() {
     Memory.showData()
-    saveTheEmployeeData()
     main()
 }
 
@@ -152,7 +164,7 @@ fun deleteEmployeeById() {
     val deleteId = readln().toIntOrNull()
 
     Memory.data.remove(key = deleteId as Int).also { println("Employee deleted successFully") }
-    saveTheEmployeeData()
+    saveData()
     main()
 }
 
