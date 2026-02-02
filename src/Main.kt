@@ -1,6 +1,7 @@
 import Memory.data
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.File
 
 fun main() {
@@ -57,8 +58,17 @@ object Memory {
 }
 
 fun saveData() {
-    val gson = Gson()
-    val converter = gson.toJson(data)
+    //if we are using default values in data classes, use factory
+    val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+
+    //for collection, we must specify the type
+    val type = Types.newParameterizedType(
+        MutableMap::class.java, Int::class.javaObjectType, Employee::class.java
+    )
+    //pass the type inside, adapter
+    val adapter = moshi.adapter<MutableMap<Int, Employee>>(type)
+
+    val converter = adapter.toJson(data)
 
     val file = File("data.json")
     file.writeText(converter)
@@ -66,27 +76,34 @@ fun saveData() {
 
 fun loadData() {
     val file = File("data.json")
-    if (!file.exists()) return
+    if (!file.exists()) {
+        data = mutableMapOf()
+        return
+    }
 
     val json = file.readText()
-    val gson = Gson()
+    if(json.isEmpty()){
+        data = mutableMapOf()
+        return
+    }
 
-    val type = object : TypeToken<MutableMap<Int, Employee>>() {}.type
-    Memory.data = gson.fromJson(json, type) ?: mutableMapOf()
+    val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+
+    val type = Types.newParameterizedType(
+        MutableMap::class.java, Int::class.javaObjectType, Employee::class.java
+    )
+
+    val adapter = moshi.adapter<MutableMap<Int, Employee>>(type)
+
+    Memory.data = adapter.fromJson(json) ?: mutableMapOf()
 }
 
 data class Employee(
-    val id: Int?,
-    val name: String,
-    val role: Role = Role.NO_ROLE,
-    val salary: Int?
+    val id: Int, val name: String, val role: Role = Role.NO_ROLE, val salary: Int
 )
 
 enum class Role {
-    MANAGER,
-    DEVELOPER,
-    INTERN,
-    NO_ROLE
+    MANAGER, DEVELOPER, INTERN, NO_ROLE
 }
 
 fun addEmployee() {
