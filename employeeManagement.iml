@@ -14,5 +14,6 @@
     <orderEntry type="library" name="google.code.gson" level="project" />
     <orderEntry type="library" name="squareup.moshi" level="project" />
     <orderEntry type="library" name="squareup.moshi.kotlin" level="project" />
+    <orderEntry type="library" name="jetbrains.kotlinx.coroutines.core" level="project" />
   </component>
 </module>
