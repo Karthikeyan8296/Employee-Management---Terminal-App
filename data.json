@@ -1,1 +1,8 @@
-{"12":{"id":12,"name":"karthik","role":"DEVELOPER","salary":3000}}
+{
+  "2": {
+    "id": 2,
+    "name": "karthik",
+    "role": "MANAGER",
+    "salary": 3000
+  }
+}

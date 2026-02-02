@@ -8,6 +8,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 fun main() {
+    //it blocks the thread, and complete the thread works, and it comes back
     runBlocking {
         while (true) {
             loadData()
@@ -44,8 +45,10 @@ fun main() {
                 4 -> filterBySalary()
                 5 -> deleteEmployeeById()
                 6 -> {
+                    println("Thank you for logging!")
                     break
                 }
+
                 else -> println("Sorry Please select one of these to continue")
             }
         }
@@ -67,6 +70,8 @@ object Memory {
     }
 }
 
+
+//serialization
 suspend fun saveData() = withContext(Dispatchers.IO) {
     //if we are using default values in data classes, use factory
     val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
@@ -86,6 +91,7 @@ suspend fun saveData() = withContext(Dispatchers.IO) {
     file.writeText(converter)
 }
 
+//deserialization
 suspend fun loadData() = withContext(Dispatchers.IO) {
     val file = File("data.json")
 
@@ -182,7 +188,8 @@ suspend fun listAllEmployee() = withContext(Dispatchers.Default) {
 suspend fun findEmployeeRole() = withContext(Dispatchers.Default) {
     println("find employee by role")
     println("1. MANAGER \n2. DEVELOPER \n3. INTERN")
-    when (val role = readln().toIntOrNull()) {
+    val role = readln().toIntOrNull()
+    when (role) {
         1 -> {
             val result = data.filter { it.value.role == Role.MANAGER }
             if (result.isEmpty()) {
