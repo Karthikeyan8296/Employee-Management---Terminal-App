@@ -2,17 +2,21 @@ import Memory.data
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.File
+
+lateinit var loadJob: Job
 
 fun main() {
     //it blocks the thread, and complete the thread works, and it comes back
     runBlocking {
-        while (true) {
-            loadData()
+        println("Starting the application...")
 
+        loadJob = launch(Dispatchers.IO) {
+            loadData()
+            println("data loaded in background!!")
+        }
+        while (true) {
             println("======================================")
             //Add
             println("1. Add Employee")
@@ -39,20 +43,45 @@ fun main() {
             val i = readln().toIntOrNull()
 
             when (i) {
-                1 -> addEmployee()
-                2 -> listAllEmployee()
-                3 -> findEmployeeRole()
-                4 -> filterBySalary()
-                5 -> deleteEmployeeById()
+                1 -> {
+                    dataIsLoaded()
+                    addEmployee()
+                }
+
+                2 -> {
+                    dataIsLoaded()
+                    listAllEmployee()
+                }
+
+                3 -> {
+                    dataIsLoaded()
+                    findEmployeeRole()
+                }
+
+                4 -> {
+                    dataIsLoaded()
+                    filterBySalary()
+                }
+
+                5 -> {
+                    dataIsLoaded()
+                    deleteEmployeeById()
+                }
+
                 6 -> {
                     println("Thank you for logging!")
                     break
                 }
-
                 else -> println("Sorry Please select one of these to continue")
             }
         }
     }
+}
+suspend fun dataIsLoaded() {
+    if (!loadJob.isCompleted) {
+        println("please wait we are loading the data")
+    }
+    loadJob.join()
 }
 
 //Local storage
@@ -92,13 +121,13 @@ suspend fun saveData() = withContext(Dispatchers.IO) {
 }
 
 //deserialization
-suspend fun loadData() = withContext(Dispatchers.IO) {
+fun loadData() {
     val file = File("data.json")
 
     //if the file doesn't exist at all
     if (!file.exists()) {
         data = mutableMapOf()
-        return@withContext
+        return
     }
 
     val json = file.readText()
@@ -106,7 +135,7 @@ suspend fun loadData() = withContext(Dispatchers.IO) {
     //if there is no data in file
     if (json.isEmpty()) {
         data = mutableMapOf()
-        return@withContext
+        return
     }
 
     val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
@@ -185,16 +214,15 @@ suspend fun listAllEmployee() = withContext(Dispatchers.Default) {
 
 
 //calculation operation
-suspend fun findEmployeeRole() = withContext(Dispatchers.Default) {
+fun findEmployeeRole() {
     println("find employee by role")
     println("1. MANAGER \n2. DEVELOPER \n3. INTERN")
-    val role = readln().toIntOrNull()
-    when (role) {
+    when (val role = readln().toIntOrNull()) {
         1 -> {
             val result = data.filter { it.value.role == Role.MANAGER }
             if (result.isEmpty()) {
                 println("No Employee found on Manager Role!")
-                return@withContext
+                return
             } else {
                 data.filter { it.value.role == Role.MANAGER }.forEach { println("Manager Role: $it") }
             }
@@ -204,7 +232,7 @@ suspend fun findEmployeeRole() = withContext(Dispatchers.Default) {
             val result = data.filter { it.value.role == Role.DEVELOPER }
             if (result.isEmpty()) {
                 println("No Employee found on Developer Role!")
-                return@withContext
+                return
             }
             data.filter { it.value.role == Role.DEVELOPER }.forEach { println("Developer Role: $it") }
         }
@@ -213,7 +241,7 @@ suspend fun findEmployeeRole() = withContext(Dispatchers.Default) {
             val result = data.filter { it.value.role == Role.INTERN }
             if (result.isEmpty()) {
                 println("No Employee found on Intern Role")
-                return@withContext
+                return
             } else {
                 data.filter { it.value.role == Role.INTERN }.forEach { println("Intern Role: $it") }
             }
@@ -221,10 +249,10 @@ suspend fun findEmployeeRole() = withContext(Dispatchers.Default) {
 
         else -> {
             println("Invalid role selected")
-            return@withContext
+            return
         }
     }
-    return@withContext
+    return
 }
 
 
@@ -250,7 +278,7 @@ suspend fun deleteEmployeeById() = withContext(Dispatchers.IO) {
 }
 
 //calculation operation
-suspend fun filterBySalary() = withContext(Dispatchers.Default) {
+fun filterBySalary() {
     println("Select which type of filter you want:")
     println("1. Exact salary Amount \n2. Salary between min X and max Y")
     val enterAmount = readln().toIntOrNull()
@@ -260,32 +288,32 @@ suspend fun filterBySalary() = withContext(Dispatchers.Default) {
         2 -> filterAmountMaxMin()
         else -> {
             println("Invalid option")
-            return@withContext
+            return
         }
     }
 }
 
-suspend fun filterByExactAmount() = withContext(Dispatchers.Default) {
+fun filterByExactAmount() {
     println("Enter the exact salary")
     val exact = readln().toIntOrNull()
     if (exact == null) {
         println("Invalid salary")
-        return@withContext
+        return
     } else {
         val result = data.filter { it.value.salary == exact }
         if (result.isEmpty()) {
             println("No salary like this found")
-            return@withContext
+            return
         } else {
             result.forEach {
                 println(it)
-                return@withContext
+                return
             }
         }
     }
 }
 
-suspend fun filterAmountMaxMin() = withContext(Dispatchers.Default) {
+fun filterAmountMaxMin() {
     println("Enter the Minimum Salary")
     val min = readln().toIntOrNull()
     println("Enter the Maximum Salary")
@@ -293,16 +321,16 @@ suspend fun filterAmountMaxMin() = withContext(Dispatchers.Default) {
 
     if (min == null || max == null) {
         println("Invalid inputs")
-        return@withContext
+        return
     } else {
         val result = data.filter { it.value.salary in min..max }
         if (result.isEmpty()) {
             println("No salary like this found")
-            return@withContext
+            return
         } else {
             result.forEach {
                 println(it)
-                return@withContext
+                return
             }
         }
     }
